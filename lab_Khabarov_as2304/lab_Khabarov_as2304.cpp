@@ -247,8 +247,7 @@ void editing_the_compressor_station(Station& new_station) { //5. Редакти�
 }
 */
 void saving_data_pipe(Pipe& pipe_data) { //6. Сохранить 
-    ofstream fileout;
-    fileout.open("information"); // OF - В ФАЙЛ (ЗАПИСЬ) (Sololearn)
+    ofstream fileout("information");  // OF - В ФАЙЛ (ЗАПИСЬ) (Sololearn)
     if (pipe_data.pipe_name == "Nothing") {
         cout << "Вы пока не создали трубу..." << endl;
 
@@ -267,8 +266,7 @@ void saving_data_pipe(Pipe& pipe_data) { //6. Сохранить
     fileout.close();
 }
 void saving_data_station(Station& station_data) { //6. Сохранить 
-    ofstream fileout;
-    fileout.open("information"); ("information"); // OF - В ФАЙЛ (ЗАПИСЬ) (Sololearn)
+    ofstream fileout("information", ios::app);  // OF - В ФАЙЛ (ЗАПИСЬ) (Sololearn)
     if (station_data.station_name == "Nothing") {
         cout << "Вы пока не создали КС..." << endl;
     }
@@ -287,70 +285,44 @@ void saving_data_station(Station& station_data) { //6. Сохранить
 }
 //-------------------------------------------------------------------------------------------------------------------------
 
-void uploading_data_pipe(Pipe& pipe_data) { //7. Загрузить ///!!!!!!!!!!!!!!!!!!!!!!!
-    ifstream filein;
-    filein.open("information"); // IF - ИЗ ФАЙЛА (ЧТЕНИЕ) (Sololearn)
-    if (filein) 
+void uploading_data_pipe(Pipe& pipe_data, ifstream& filein) {
+    getline(filein, pipe_data.pipe_name);
+    filein >> pipe_data.pipe_length;
+    filein >> pipe_data.pipe_diameter;
+    filein >> pipe_data.pipe_repair;
+}
+
+
+void uploading_data_station(Station& station_data, ifstream& filein) {
+    getline(filein, station_data.station_name);
+    filein >> station_data.station_workshops;
+    filein >> station_data.station_working_workshops;
+    filein >> station_data.station_efficiency;
+}
+
+void uploading_data(Pipe& pipe_data,Station& station_data) { //7. Загрузить ///!!!!!!!!!!!!!!!!!!!!!!!
+    ifstream file("information");
+    if (file) 
     {
         string name; // Нужно для проверки
-        bool flag_pipe = 0;
-        while (getline(filein, name))
+        pipe_data = Pipe();
+        station_data = Station();
+        while (getline(file, name))
         {
-            if (name == "Инфомация о трубе:") 
+            if (name == "Инфомация о трубе:")
             {
-                cout << "Данные о трубе загружены!" << endl;
-                getline(filein, pipe_data.pipe_name);
-                filein >> pipe_data.pipe_length;
-                filein >> pipe_data.pipe_diameter;
-                filein >> pipe_data.pipe_repair;
-                if (pipe_data.pipe_repair == 0) {
-                    cout << "Статус трубы: Готов " << endl;
-                }
-                else {
-                    cout << "Статус трубы: В ремонте" << endl;
-                }
-                flag_pipe = 1;
+                uploading_data_pipe(pipe_data, file);
+            }
+            if (name == "Инфомация о КС:") {
+                uploading_data_station(station_data, file);
             }
         }
-        if (flag_pipe == 0) 
-        {
-            cout << "Вы пока что не создали или не сохраняли информацию о трубе..." << endl;
+        cout << "Данные загружены" << endl;
+        file.close();
 
-            flag_pipe = {};
-        }
-        filein.close();
     }
 }
 
-void uploading_data_station(Station& station_data) { //7. Загрузить ///!!!!!!!!!!!!!!!!!!!!!!!
-    ifstream filein;
-    filein.open("information"); // IF - ИЗ ФАЙЛА (ЧТЕНИЕ) (Sololearn)
-    if (filein) 
-    {
-        string name; // Нужно для проверки
-        bool flag_station = 0;
-        while (getline(filein, name))
-        {
-   
-            if (name == "Инфомация о КС:") 
-            {
-                cout << "Данные о КС загружены!" << endl;
-                getline(filein, station_data.station_name);
-                filein >> station_data.station_workshops;
-                filein >> station_data.station_working_workshops;
-                filein >> station_data.station_efficiency;
-                flag_station = 1;
-            }
-        }
-        if (flag_station == 0) 
-        {
-            cout << "Вы пока что не создали или не сохраняли информацию о КС..." << endl;
-
-            station_data = {};
-        }
-        filein.close();
-    }
-}
 
 
 //-------------------------------------------------------------------------------------------------------------------------
@@ -424,8 +396,7 @@ int main()
     }
     case 7: 
     {
-        uploading_data_pipe(pipe0);
-        uploading_data_station(station0);
+        uploading_data(pipe0, station0);
         break;
     }
 
