@@ -1,52 +1,27 @@
+// header для данных по проверке и логированию
 #pragma once
+#include <unordered_map> // для хранения и извлечения пар «ключ-значение»
+#include <unordered_set> // для хранения уникальных элементов в неупорядоченном виде.
 #include <iostream>
-#include <unordered_map>
-using namespace std;
-#define INPUT_LINE(in, str) getline(in>>std::ws, str); \
-						std::cerr << str << std::endl
-#define PRINT_PARAM(out, x) out<< #x << "=" << x << std::endl
+#include <string>
+#include <fstream>
+#include <chrono> // для времени (логирование)
+
+
+std::string inputString(std::istream& in = std::cin); //  Data.app
 template <typename T>
-T GetCorrectData(T min, T max)
-{
-	T x;
-	while ((std::cin >> x).fail() || std::cin.peek() != '\n' || x < min || x > max)
-	{
-		std::cin.clear();
-		std::cin.ignore(100000, '\n');
-		std::cout << "Пожалуйста, введите верные данные от " << min << " до " << max << ":";
-	}
-	cerr << x << endl;
-	return x;
-}
+
+T inputNumber(std::istream& in = std::cin);
+
 template <typename T>
-T& SelectElement(unordered_map<int, T>& notes, int key)
-{
-	auto it = notes.find(key);
-	if (it != notes.end())
-	{
-		return it->second;
-	}
-	else
-	{
-		cout << "Превышение количества доступных элементов!" << endl
-			<< "Пожалуйста, введите верные данные (число элементов: " << notes.size() << "): ";
-	}
-}
-template <typename K>
-unordered_map<int, K> removeKeyIfExists(std::unordered_map<int, K>& notes, int key) {
-	if (notes.find(key) != notes.end()) {
-		notes.erase(key);
-		cout << "Удаление завершено успешно!" << endl;
-		return notes;
-	}
-	else {
-		cout << "Данный ключ " << key << " не существует. Напишите правильно: " << endl;
-		int newKey;
-		cin >> newKey;
-		return removeKeyIfExists(notes, newKey);
-	}
-}
-class redirect_output_wrapper
+T getCorrectNumber(T a, T b, bool included = true, std::istream& in = std::cin);
+
+template <typename T>
+T getPositiveNumber(std::istream& in = std::cin);
+
+bool confirm(std::string);
+
+class redirect_output_wrapper // ЛОГИРОВАНИЕ (https://github.com/papilinatm/cpp_lessons_2020/commit/347852a592b25762a6b02f685bb342befc015191)
 {
 	std::ostream& stream;
 	std::streambuf* const old_buf;

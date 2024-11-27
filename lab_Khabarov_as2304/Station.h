@@ -1,25 +1,43 @@
+// header - ингредиенты для КС
 #pragma once
+#include <iostream>
 #include <string>
-#include "Data.h"
 #include <fstream>
-using namespace std;
+
 class Station
 {
-public:
+private: // А зачем пользователю менять первоначальные значения??? НЕНАДА. Пускайй шаблончик будет приватным и только для меня (не изменяемым).
 	static int maxId;
 	int Id;
-	string station_name = "Nothing";
+	std::string station_name = "Nothing";
 	int station_workshops = 0;
 	int station_working_workshops = 0;
-	double station_efficiency = 0.0;
-int GetId();
-string GetName() const;
-int GetWorkshops() const;
-int GetActWorkshops() const;
-int GetPercentOfNonActiveWorkshops() const;
-void PrintWorkshops() const;;
-friend ostream& operator << (ostream& out, const Station& newStation);
-friend istream& operator >> (istream& in, Station& newStation);
-friend ofstream& operator << (ofstream& fout, const Station& newStation);
-friend ifstream& operator >> (ifstream& fin, Station& newStation);
+	double station_efficiency = 0.0; // ОКАЗЫВАЕТСЯ эффективность - это от 0 до 1 ._.
+public: // Для пользователя
+	Station();
+
+	static Station addStation();
+	static void resetMaxId();
+
+	friend std::ostream& operator << (std::ostream& out, const Station& cs);
+	friend std::istream& operator >> (std::istream& in, Station& cs);
+	friend std::ofstream& operator << (std::ofstream& fout, const Station& cs);
+	friend std::ifstream& operator >> (std::ifstream& fin, Station& cs); // 4 друга, всегда вместе и рядом.
+
+	int getID()
+	{
+		return Id;
+	}
+
+	std::string getName()
+	{
+		return station_name;
+	}
+	double GetPercentOfNonActiveWorkshops()
+	{
+		return(double)(station_workshops - station_working_workshops) * 100 / station_workshops; // процент нерабочих цехов
+	}
+	bool run_working_workshops();
+	bool stop_working_workshops();
+
 };
