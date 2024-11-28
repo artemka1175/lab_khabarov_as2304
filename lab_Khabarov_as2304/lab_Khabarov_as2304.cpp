@@ -3,7 +3,7 @@
 #include "Data.h"
 #include "Pipe.h"
 #include "Station.h"
-#include "lab_Khabarov_as2304.h"
+
 
 using namespace std;
 using namespace chrono;
@@ -17,7 +17,6 @@ void printMap(const unordered_map<int, T>& map) //УЗНАЁМ КЛЮЧ
 {
     for (auto& [id, val] : map)
     {
-        cout << id;
         cout << val;
     }
 }
@@ -28,7 +27,6 @@ void saveMap(std::ofstream& fout, const std::unordered_map<int, T>& map) //СО�
     fout << map.size() << endl;
     for (auto& [id, val] : map)
     {
-        fout << id;
         fout << val;
     }
 }
@@ -74,8 +72,8 @@ void loadFile(unordered_map<int, Pipe>& pipemap, unordered_map<int, Station>& cs
         loadMap(fin, pipemap);
         loadMap(fin, csmap);
         fin.close();
-        cout << "Загрузилось " << pipemap.size() << "труб." << endl;
-        cout << "Загрузилось " << csmap.size() << "КС." << endl;
+        cout << "Загрузилось " << pipemap.size() << " труб." << endl;
+        cout << "Загрузилось " << csmap.size() << " КС." << endl;
     }
     else
         cout << "ОШИБКА." << endl;
@@ -100,7 +98,7 @@ bool checkByWSInWork(Station& Station, double percent)
     return Station.GetPercentOfNonActiveWorkshops() >= percent; //поиск по проценту НЕ изготовленных цехов
 }
 template<typename T, typename U>
-unordered_set<int> findByFilter(unordered_map<int, T>& map, Filter<T, U> f, U param)
+unordered_set<int> findByFilter(unordered_map<int, T>& map, Filter<T, U> f, U param) // Провекра на то, подходит ли тот или иной объект под заданное значение.
 {
     unordered_set<int> res;
     int i = 0;
@@ -165,8 +163,8 @@ template<typename T>
 unordered_set<int> selectByChosenID(unordered_map<int, T>& map, unordered_set<int>& set = {})
 {
     unordered_set<int> res;
-    cout << "Выберите все Id." << endl;
-    cout << "Для выхода нажмите " << endl;
+    cout << "Выберите все Id:" << endl;
+    cout << "(Для выхода нажмите 0)" << endl;
     while (true)
     {
         int id = inputNumber<int>();
@@ -183,7 +181,7 @@ unordered_set<int> selectByChosenID(unordered_map<int, T>& map, unordered_set<in
 }
 void coutFoundWithId(unordered_set<int>& set)
 {
-    cout << "Мы  нашли подходящие Id: ";
+    cout << "Мы нашли подходящие Id: ";
     for (int id : set)
         cout << id << " ";
     cout << endl;
@@ -232,7 +230,7 @@ void editSelected(unordered_map<int, T>& map, unordered_set<int>& set)
     cout << "Что вы хотите сделать с ними?" << endl;
     cout << "1. Вывести на экран;" << endl;
     cout << "2. Проредактировать;" << endl;
-    cout << "3. Удалить." << endl;
+    cout << "3. Удалить;" << endl;
     cout << "4. Выход." << endl;
     switch (getCorrectNumber<int>(0, 3))
     {
@@ -385,13 +383,14 @@ void uploading_data(Pipe& pipe_data,Station& station_data) { //7. Загрузи
 //-------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------
 
-int MenuOutput()
+int Menu()
 {
     unordered_map<int, Pipe> pipemap;
     unordered_map<int, Station> csmap;
     while (true) // меню ВСЕГДА будет.
     {
     cout << endl;
+    cout << "-------------------------------------------------------------------------------" << endl;
     cout << "Пожалуйста, выберите режим и напишите соответствующую цифру:" << endl;
     cout << "1. Добавить трубу;  " << endl;
     cout << "2. Добавить КС;" << endl;
@@ -407,52 +406,67 @@ int MenuOutput()
     {
     case 1:
     {
+        cout << "-------------------------------------------------------------------------------" << endl;
         Pipe Pipe = Pipe::addPipe();
         pipemap.emplace(Pipe.getID(), Pipe);
         break;
     }
     case 2:
     {
+        cout << "-------------------------------------------------------------------------------" << endl;
         Station Station = Station::addStation();
         csmap.emplace(Station.getID(), Station);
         break;
     }
     case 3:
     {
+        cout << "-------------------------------------------------------------------------------" << endl;
         if (pipemap.empty() and csmap.empty()) coutNoObjectFound();
         else
         {
             cout << "ТРУБЫ" << endl; printMap(pipemap);
+            cout << "-------------------------------------------------------------------------------" << endl;
             cout << "КС" << endl; printMap(csmap);
         }
         break;
     }
     case 4:
     {
+        cout << "-------------------------------------------------------------------------------" << endl;
         selectObjects(pipemap);
         break;
     }
     case 5:
     {
+        cout << "-------------------------------------------------------------------------------" << endl;
         selectObjects(csmap);
         break;
     }
     case 6:
     {
+        cout << "-------------------------------------------------------------------------------" << endl;
         saveFile(pipemap, csmap);
         break;
     }
     case 7:
     {
+        cout << "-------------------------------------------------------------------------------" << endl;
         loadFile(pipemap, csmap);
         break;
     }
     case 8:
     {
+        cout << "-------------------------------------------------------------------------------" << endl;
         pipemap.clear();
         csmap.clear();
         cout << "ГОТОВО!" << endl;
         break;
+    }
+
+    case 9:
+    {
+        cout << "Прощайте." << endl;
+        return 0;
     }
     default:
     {
@@ -481,7 +495,7 @@ int main()
     if (logfile)
         cerr_out.redirect(logfile);
 
-    MenuOutput();
+    Menu();
 
     return 0;
 }

@@ -7,7 +7,7 @@ using namespace std;
 int Pipe::maxId = 0;
 
 
-Pipe::Pipe()
+Pipe::Pipe()  // https://github.com/papilinatm/cpp_lessons_2020/commit/9577d7431a4351dbdfe9de951d0b92b50e16a2f4
 {
 	Id = ++maxId;
 	pipe_name = "";
@@ -16,18 +16,19 @@ Pipe::Pipe()
 
 ostream& operator<<(std::ostream& out, const Pipe& Pipe)
 {
-	cout << "ID трубы = " << Pipe.Id << endl;
+	out << "ID трубы = " << Pipe.Id << endl;
 	out << "Имя: " << Pipe.pipe_name << endl;
 	out << "Диаметр: " << Pipe.pipe_diameter << endl;
 	out << "Длина: " << Pipe.pipe_length << endl;
 		out << "Статус: " << Pipe.pipe_repair << endl;
+		out << endl;
 
 	return out;
 }
 
 istream& operator>>(istream& in, Pipe& Pipe)
 {
-	cout << "pipe ID = " << Pipe.Id << endl;
+	cout << "ID трубы (он же ключ) = " << Pipe.Id << endl;
 	cout << "Напишите имя трубы: ";
 	Pipe.pipe_name = inputString(in);
 	cout << "Напишите длину трубы: ";
@@ -35,6 +36,7 @@ istream& operator>>(istream& in, Pipe& Pipe)
 	cout << "Напишите диаметр трубы: ";
 	Pipe.pipe_length = getPositiveNumber<double>(in);
 	cout << "Статус трубы: 0 (в ремонте)" << endl;
+
 
 	return in;
 }
@@ -74,6 +76,10 @@ void Pipe::editPipe() // меняет статус. просто ._.
 	pipe_repair = !pipe_repair;
 }
 
+void Pipe::resetMaxId()
+{
+	maxId = 0; //Удаление КС
+}
 //istream& operator >> (istream& in, Pipe& new_pipe)
 //{
 //

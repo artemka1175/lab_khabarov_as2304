@@ -6,7 +6,7 @@ using namespace std;
 
 int Station::maxId = 0;
 
-Station::Station()
+Station::Station() // https://github.com/papilinatm/cpp_lessons_2020/commit/9577d7431a4351dbdfe9de951d0b92b50e16a2f4
 {
 	Id = ++maxId;
 	station_name = "";
@@ -15,11 +15,12 @@ Station::Station()
 
 ostream& operator << (ostream& out, const Station& Station) // поток вывода.
 {
-	cout << "ID КС: " << Station.Id << endl;
+	out << "ID КС: " << Station.Id << endl;
 	out << "Имя: " << Station.station_name << endl;
 	out << "Количество цехов: " << Station.station_workshops << endl;
 	out << "Количество РАБОЧИХ цехов: " << Station.station_working_workshops << endl;
 		out << "Эффективность: " << Station.station_efficiency << endl;
+		out << endl;
 
 	return out;
 }
@@ -75,6 +76,17 @@ bool Station::run_working_workshops() // чтобы поменять количество рабочих цехов
 	if (station_working_workshops < station_workshops)
 	{
 		station_working_workshops++;
+		return 1;
+	}
+	else
+		return 0;
+}
+
+bool Station::stop_working_workshops() // change number of ws in in_repair for cs
+{
+	if (station_working_workshops > 0)
+	{
+		station_working_workshops--;
 		return 1;
 	}
 	else

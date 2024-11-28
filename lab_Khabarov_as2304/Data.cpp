@@ -9,7 +9,7 @@ string inputString(istream& in) //Отвечает за запись текста БУКВАЛЬНО...
 	cerr << str << endl; // Здесь происходит ЛОГИРОВАНИЕ (собираем данные). Отныне оно ТАК обозначается
 	return str;
 }
-template <typename T> // Великая вещь, проверяющая всё и вся на своём пути.
+template <typename T> // Великая вещь, проверяющая всё и вся на своём пути. (https://github.com/papilinatm/cpp_lessons_2020/commit/2f647f272f544680bd5ab75b8b2e3ffc56594343)
 T inputNumber(istream& in)
 {
 	T x;
@@ -35,7 +35,7 @@ T getCorrectNumber(T a, T b, bool included, istream& in) // Для ограничений (swi
 		|| (!included && (x <= a || x >= b))) // a <= x <= b
 	{
 		string str_included = included ? "= " : " ";
-		cout << "PLEASE напишите число от " <<  a << " до <" <<  b << ": " << endl;
+		cout << "PLEASE напишите число от " <<  a << " до " <<  b << ": " << endl;
 		x = inputNumber<T>(in);
 	}
 	return x;
@@ -53,6 +53,8 @@ template double getPositiveNumber(istream& in); // проверяет целые и числа с зап
 
 bool confirm(string message)
 {
-	cout << message << "\n0.no\n1.yes" << endl;
+	cout << message <<  endl;
+	cout <<  "0. Нет." << endl;
+	cout <<  "1. Да." << endl;
 	return getCorrectNumber(0, 1);
 }
