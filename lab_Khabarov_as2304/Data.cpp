@@ -25,7 +25,7 @@ T inputNumber(istream& in)
 	return x;
 }
 template int inputNumber(istream& in);
-template double inputNumber(istream& in); // проверяет целые и числа с запятыми
+template double inputNumber(istream& in); 
 
 template <typename T = int>
 T getCorrectNumber(T a, T b, bool included, istream& in) // Для ограничений (switch.case 2.0)
@@ -50,11 +50,3 @@ T getPositiveNumber(istream& in)
 }
 template int getPositiveNumber(istream& in);
 template double getPositiveNumber(istream& in); // проверяет целые и числа с запятыми
-
-bool confirm(string message)
-{
-	cout << message <<  endl;
-	cout <<  "0. Нет." << endl;
-	cout <<  "1. Да." << endl;
-	return getCorrectNumber(0, 1);
-}

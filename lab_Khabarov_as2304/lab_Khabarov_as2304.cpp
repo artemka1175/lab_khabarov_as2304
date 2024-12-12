@@ -1,5 +1,6 @@
 ﻿// боль
-#pragma once // связь между CPP и HEADER
+#include <unordered_set> // для хранения уникальных элементов в неупорядоченном виде.
+#include <unordered_map> // для хранения и извлечения пар «ключ-значение»
 #include "Data.h"
 #include "Pipe.h"
 #include "Station.h"
@@ -55,8 +56,8 @@ void saveFile(const unordered_map<int, Pipe>& pipemap, const unordered_map<int, 
         saveMap(fout, pipemap);
         saveMap(fout, csmap);
         fout.close();
-        cout << "Сохранилось " << pipemap.size() << "труб." << endl;
-        cout << "сохранилось " << csmap.size() << "КС." << endl;
+        cout << "Сохранилось " << pipemap.size() << " труб." << endl;
+        cout << "сохранилось " << csmap.size() << " КС." << endl;
     }
     else cout << "ОШИБКА." << endl;
 }
@@ -86,8 +87,12 @@ template<typename T>
 bool checkByName(T& val, string name)
 {
     size_t pos = val.getName().find(name);
-    if (pos != std::string::npos) return true; //поиск по имени (позиция)
-    else return false;
+    if (pos != std::string::npos) {
+        return true;
+    }//поиск по имени (позиция)
+    else {
+        return false;
+    }
 }
 bool checkByRepairStatus(Pipe& Pipe, bool status)
 {
@@ -104,8 +109,9 @@ unordered_set<int> findByFilter(unordered_map<int, T>& map, Filter<T, U> f, U pa
     int i = 0;
     for (auto& [id, val] : map)
     {
-        if (f(val, param))
+        if (f(val, param)) {
             res.emplace(id);
+        }
     }
     return res;
 }
@@ -119,13 +125,15 @@ unordered_set<int> selectByChosenFilter(unordered_map<int, Pipe>& map)
     {
     case 1:
     {
-        cout << "Напишите имя (или кусок от него): "; string name = inputString();
+        cout << "Напишите имя (или кусок от него): ";
+        string name = inputString();
         res = findByFilter(map, checkByName, name);
         break;
     }
     case 2:
     {
-        cout << "Напишите статус (0 = В РЕМОНТЕ; 1 = ГОТОВ): "; bool status = getCorrectNumber<int>(0, 1);
+        cout << "Напишите статус (0 = В РЕМОНТЕ; 1 = ГОТОВ): "; 
+        bool status = getCorrectNumber<int>(0, 1);
         res = findByFilter(map, checkByRepairStatus, status);
         break;
     }
@@ -186,11 +194,11 @@ void coutFoundWithId(unordered_set<int>& set)
         cout << id << " ";
     cout << endl;
 }
-void editMap(unordered_map<int, Pipe>& map)
+void editMap(unordered_map<int, Pipe>& set)
 {
-    for (auto& [id, p] : map)
+    for (auto& [id, p] : set)
         p.editPipe();
-    if (!map.empty()) cout << "Готово!" << endl;
+    if (!set.empty()) cout << "Готово!" << endl;
     else coutNoObjectFound();
 }
 void editMap(unordered_map<int, Station>& map)
@@ -232,12 +240,13 @@ void editSelected(unordered_map<int, T>& map, unordered_set<int>& set)
     cout << "2. Проредактировать;" << endl;
     cout << "3. Удалить;" << endl;
     cout << "4. Выход." << endl;
-    switch (getCorrectNumber<int>(0, 3))
+    switch (getCorrectNumber<int>(1, 4))
     {
     case 1:
     {
-        for (int id : set)
+        for (int id : set) {
             cout << map[id];
+        }
         break;
     }
     case 2:
@@ -247,8 +256,10 @@ void editSelected(unordered_map<int, T>& map, unordered_set<int>& set)
     }
     case 3:
     {
-        for (int id : set)
+        for (int id : set) {
             map.erase(id);
+        }
+        cout << "Готово!" << endl;
         break;
     }
     case 0:
@@ -271,10 +282,14 @@ void selectObjects(unordered_map<int, T>& map)
     cout << "Как мы будем имкать?" << endl;
     cout << "1. По ID;" << endl;
     cout << "2. По фильтру." << endl;
-    if (getCorrectNumber(1, 2) == 1) //ID
-        res = selectByChosenID(map, res);
-    else // Filter
+    if (getCorrectNumber(1, 2) == 1)
+    { 
+        res = selectByChosenID(map, res);//ID
+    }
+    else
+    {
         res = selectByChosenFilter(map);
+    }
     if (res.size() != 0)
     {
         coutFoundWithId(res);
@@ -282,9 +297,13 @@ void selectObjects(unordered_map<int, T>& map)
         cout << "1. ВСЕ;" << endl;
         cout << "2. конкретные." << endl;
         if (getCorrectNumber(1, 2) == 2) //ID
+        {
             res = selectByChosenID(map, res);
+        }
         if (res.size() != 0)
+        {
             editSelected(map, res);
+        }
         else coutNoObjectFound();
     }
     else coutNoObjectFound();
@@ -301,84 +320,6 @@ void deleteAll(unordered_map<int, Pipe>& pipemap, unordered_map<int, Station>& c
     cout << "Готово!" << endl;
     return;
 }
-/*void saving_data_pipe(Pipe& pipe_data) { //6. Сохранить 
-    ofstream fileout("information");  // OF - В ФАЙЛ (ЗАПИСЬ) (Sololearn)
-    if (pipe_data.pipe_name == "Nothing") {
-        cout << "Вы пока не создали трубу..." << endl;
-
-    }
-    else {
-        cout << "Сохранение данных (труба)..." << endl;
-        if (fileout) {
-            fileout << "Инфомация о трубе:" << endl;
-            fileout << pipe_data.pipe_name << endl;
-            fileout << pipe_data.pipe_length << endl;
-            fileout << pipe_data.pipe_diameter << endl;
-            fileout << pipe_data.pipe_repair << endl;
-            cout << "Готово!" << endl;
-        }
-    }
-    fileout.close();
-}
-void saving_data_station(Station& station_data) { //6. Сохранить 
-    ofstream fileout("information", ios::app);  // OF - В ФАЙЛ (ЗАПИСЬ) (Sololearn)
-    if (station_data.station_name == "Nothing") {
-        cout << "Вы пока не создали КС..." << endl;
-    }
-    else {
-        cout << "Сохранение данных (КС)..." << endl;
-        if (fileout) {
-            fileout << "Инфомация о КС:" << endl;;
-            fileout << station_data.station_name << endl;
-            fileout << station_data.station_workshops << endl;
-            fileout << station_data.station_working_workshops << endl;
-            fileout << station_data.station_efficiency << endl;
-            cout << "Готово!" << endl;
-        }
-    }
-    fileout.close();
-}
-*/
-//-------------------------------------------------------------------------------------------------------------------------
-/*
-void uploading_data_pipe(Pipe& pipe_data, ifstream& filein) {
-    getline(filein, pipe_data.pipe_name);
-    filein >> pipe_data.pipe_length;
-    filein >> pipe_data.pipe_diameter;
-    filein >> pipe_data.pipe_repair;
-}
-
-
-void uploading_data_station(Station& station_data, ifstream& filein) {
-    getline(filein, station_data.station_name);
-    filein >> station_data.station_workshops;
-    filein >> station_data.station_working_workshops;
-    filein >> station_data.station_efficiency;
-}
-
-void uploading_data(Pipe& pipe_data,Station& station_data) { //7. Загрузить ///!!!!!!!!!!!!!!!!!!!!!!!
-    ifstream file("information");
-    if (file) 
-    {
-        string name; // Нужно для проверки
-        pipe_data = Pipe();
-        station_data = Station();
-        while (getline(file, name))
-        {
-            if (name == "Инфомация о трубе:")
-            {
-                uploading_data_pipe(pipe_data, file);
-            }
-            if (name == "Инфомация о КС:") {
-                uploading_data_station(station_data, file);
-            }
-        }
-        cout << "Данные загружены" << endl;
-        file.close();
-
-    }
-}
-*/
 //-------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------
@@ -389,96 +330,117 @@ int Menu()
     unordered_map<int, Station> csmap;
     while (true) // меню ВСЕГДА будет.
     {
-    cout << endl;
-    cout << "-------------------------------------------------------------------------------" << endl;
-    cout << "Пожалуйста, выберите режим и напишите соответствующую цифру:" << endl;
-    cout << "1. Добавить трубу;  " << endl;
-    cout << "2. Добавить КС;" << endl;
-    cout << "3. Просмотр всех объектов; " << endl;
-    cout << "4. Редактировать  нужную трубу (!!!ОБНОВЛЕНИЕ!!!); " << endl;
-    cout << "5. Редактировать нужную КС (!!!ОБНОВЛЕНИЕ!!!); " << endl;
-    cout << "6. Сохранить; " << endl;
-    cout << "7. Загрузить; " << endl;
-    cout << "8. Очистить данные (!!!НОВИНКА!!!); " << endl;
-    cout << "9. Выход." << endl;
-    cout << endl;
-    switch (getCorrectNumber(1, 9))
-    {
-    case 1:
-    {
+        cout << endl;
         cout << "-------------------------------------------------------------------------------" << endl;
-        Pipe Pipe = Pipe::addPipe();
-        pipemap.emplace(Pipe.getID(), Pipe);
-        break;
-    }
-    case 2:
-    {
-        cout << "-------------------------------------------------------------------------------" << endl;
-        Station Station = Station::addStation();
-        csmap.emplace(Station.getID(), Station);
-        break;
-    }
-    case 3:
-    {
-        cout << "-------------------------------------------------------------------------------" << endl;
-        if (pipemap.empty() and csmap.empty()) coutNoObjectFound();
-        else
+        cout << "Пожалуйста, выберите режим и напишите соответствующую цифру:" << endl;
+        cout << "1. Добавить трубу;  " << endl;
+        cout << "2. Добавить КС;" << endl;
+        cout << "3. Просмотр всех объектов; " << endl;
+        cout << "4. Найти... (!!!НОВИНКА!!!); " << endl;
+        cout << "5. Создать связь; " << endl;
+        cout << "6. Просмотр связей; " << endl;
+        cout << "7. Топологическая сортировка; " << endl;
+        cout << "8. Удалить связь; " << endl;
+        cout << "9. Сохранить; " << endl;
+        cout << "10. Загрузить; " << endl;
+        cout << "11. Очистить данные (!!!НОВИНКА!!!); " << endl;
+        cout << "12. Выход." << endl;
+        cout << endl;
+        switch (getCorrectNumber(1, 12))
         {
-            cout << "ТРУБЫ" << endl; printMap(pipemap);
+        case 1:
+        {
             cout << "-------------------------------------------------------------------------------" << endl;
-            cout << "КС" << endl; printMap(csmap);
+            Pipe Pipe = Pipe::addPipe();
+            pipemap.emplace(Pipe.getID(), Pipe);
+            break;
         }
-        break;
-    }
-    case 4:
-    {
-        cout << "-------------------------------------------------------------------------------" << endl;
-        selectObjects(pipemap);
-        break;
-    }
-    case 5:
-    {
-        cout << "-------------------------------------------------------------------------------" << endl;
-        selectObjects(csmap);
-        break;
-    }
-    case 6:
-    {
-        cout << "-------------------------------------------------------------------------------" << endl;
-        saveFile(pipemap, csmap);
-        break;
-    }
-    case 7:
-    {
-        cout << "-------------------------------------------------------------------------------" << endl;
-        loadFile(pipemap, csmap);
-        break;
-    }
-    case 8:
-    {
-        cout << "-------------------------------------------------------------------------------" << endl;
-        pipemap.clear();
-        csmap.clear();
-        cout << "ГОТОВО!" << endl;
-        break;
-    }
+        case 2:
+        {
+            cout << "-------------------------------------------------------------------------------" << endl;
+            Station Station = Station::addStation();
+            csmap.emplace(Station.getID(), Station);
+            break;
+        }
+        case 3:
+        {
+            cout << "-------------------------------------------------------------------------------" << endl;
+            if (pipemap.empty() and csmap.empty()) coutNoObjectFound();
+            else
+            {
+                cout << "ТРУБЫ" << endl;
+                cout << endl;
+                printMap(pipemap);
+                cout << "-------------------------------------------------------------------------------" << endl;
+                cout << "КС" << endl;
+                printMap(csmap);
+            }
+            break;
+        }
+        case 4:
+        {
+            cout << "-------------------------------------------------------------------------------" << endl;
+            break;
+        }
+        case 5:
+        {
+            cout << "-------------------------------------------------------------------------------" << endl;
+            break;
+        }
+        case 6:
+        {
+            cout << "-------------------------------------------------------------------------------" << endl;
+            break;
+        }
+        case 7:
+        {
+            cout << "-------------------------------------------------------------------------------" << endl;
+            break;
+        }
+        case 8:
+        {
+            cout << "-------------------------------------------------------------------------------" << endl;
+            break;
+        }
+        case 9:
+        {
+            cout << "-------------------------------------------------------------------------------" << endl;
+            saveFile(pipemap, csmap);
+            break;
+        }
+        case 10:
+        {
+            cout << "-------------------------------------------------------------------------------" << endl;
+            loadFile(pipemap, csmap);
+            break;
+        }
+        case 11:
+        {
+            cout << "-------------------------------------------------------------------------------" << endl;
+            pipemap.clear();
+            Pipe::resetMaxId();
+            csmap.clear();
+            Station::resetMaxId();
+            cout << "ГОТОВО!" << endl;
+            break;
+        }
 
-    case 9:
-    {
-        cout << "Прощайте." << endl;
-        return 0;
-    }
-    default:
-    {
-        cout << "К сожалению, произошла ошибка. Простите..." << endl; // Премию тому, кто сломает код.
-        return 0;
-    }
+        case 12:
+        {
+            cout << "Прощайте." << endl;
+            return 0;
+        }
+        default:
+        {
+            cout << "К сожалению, произошла ошибка. Простите..." << endl; // .
+            return 0;
+        }
 
-    }
-    cout << endl;
-    }
-}
 
+        }
+        cout << endl;
+        }
+    }
 int main()
 {
     setlocale(LC_ALL, "Russian"); // русификатор
