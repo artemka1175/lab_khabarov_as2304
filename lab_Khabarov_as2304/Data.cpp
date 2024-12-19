@@ -50,3 +50,19 @@ T getPositiveNumber(istream& in)
 }
 template int getPositiveNumber(istream& in);
 template double getPositiveNumber(istream& in); // проверяет целые и числа с запятыми
+
+template <typename T>
+T GetCorrectDiameter(T min, T max)
+{
+	T diameter;
+	cin >> diameter;
+	while (((diameter != 500) && (diameter != 700) && (diameter != 1000) && (diameter != 1400)) || diameter < min || diameter > max || cin.fail() || cin.peek() != '\n')
+	{
+		cin.clear();
+		cin.ignore(1000000, '\n');
+		cout << "Please, enter the correct pipe diameter [500, 700, 1000, 1400]: ";
+		cin >> diameter;
+	}
+	cerr << diameter << endl;
+	return diameter;
+}

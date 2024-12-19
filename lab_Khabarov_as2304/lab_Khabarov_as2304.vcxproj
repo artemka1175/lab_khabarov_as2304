@@ -129,6 +129,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="connections.cpp" />
     <ClCompile Include="Data.cpp" />
     <ClCompile Include="lab_Khabarov_as2304.cpp" />
     <ClCompile Include="Pipe.cpp" />

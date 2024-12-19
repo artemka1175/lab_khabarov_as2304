@@ -17,6 +17,9 @@ T getCorrectNumber(T a, T b, bool included = true, std::istream& in = std::cin);
 template <typename T>
 T getPositiveNumber(std::istream& in = std::cin);
 
+template <typename T>
+T GetCorrectDiameter(T min, T max);
+
 
 class redirect_output_wrapper // ËÎÃÈĞÎÂÀÍÈÅ (https://github.com/papilinatm/cpp_lessons_2020/commit/347852a592b25762a6b02f685bb342befc015191)
 {
