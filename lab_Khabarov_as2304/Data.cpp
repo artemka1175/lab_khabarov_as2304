@@ -1,68 +1,104 @@
-// ФАЙЛ CPP ДЛЯ ПРОВЕРОК
-#include "Data.h" 
-using namespace std;
-
-string inputString(istream& in) //Отвечает за запись текста БУКВАЛЬНО...
-{
-	string str;
-	getline(in >> ws, str); //получше вашил cin
-	cerr << str << endl; // Здесь происходит ЛОГИРОВАНИЕ (собираем данные). Отныне оно ТАК обозначается
-	return str;
-}
-template <typename T> // Великая вещь, проверяющая всё и вся на своём пути. (https://github.com/papilinatm/cpp_lessons_2020/commit/2f647f272f544680bd5ab75b8b2e3ffc56594343)
-T inputNumber(istream& in)
+#include "Data.h"
+#include <iostream>
+#include <string>
+#define INPUT_LINE(in, str) getline(in>> ws, str); \
+						 cerr << str <<  endl
+#define PRINT_PARAM(out, x) out<< #x << "=" << x <<  endl
+template <typename T>
+T GetCorrectData(T min, T max)
 {
 	T x;
-	while ((in >> x).fail()
-		|| in.peek() != '\n') //эта штука будет до тех пор, пока не будет ошибки и пока вы не напишите что-нибудь туда
+	while ((cin >> x).fail() || cin.peek() != '\n' || x < min || x > max)
 	{
-		in.clear();
-		in.ignore(10000, '\n');
-		cout << "Вы написали неверное значение. Напишите снова: " << endl;
-		cerr << x << endl;
+		cin.clear();
+		cin.ignore(100000, '\n');
+		cout << "Мы вас не поняли. Напишите число от " << min << " до " << max << ":" << endl;
 	}
 	cerr << x << endl;
+
 	return x;
 }
-template int inputNumber(istream& in);
-template double inputNumber(istream& in); 
-
-template <typename T = int>
-T getCorrectNumber(T a, T b, bool included, istream& in) // Для ограничений (switch.case 2.0)
-{
-	T x = inputNumber<T>(in);
-	while ((included && (x<a || x>b))
-		|| (!included && (x <= a || x >= b))) // a <= x <= b
-	{
-		string str_included = included ? "= " : " ";
-		cout << "PLEASE напишите число от " <<  a << " до " <<  b << ": " << endl;
-		x = inputNumber<T>(in);
-	}
-	return x;
-}
-template int getCorrectNumber<int>(int a, int b, bool included, istream& in);
-template double getCorrectNumber<double>(double a, double b, bool included, istream& in); // проверяет целые и числа с запятыми
-
 template <typename T>
-T getPositiveNumber(istream& in)
+T& SelectElement(unordered_map<int, T>& notes, int key)
 {
-	return getCorrectNumber<T>(0, std::numeric_limits<T>::max(), false, in); //положительные числа ONLY
+	auto it = notes.find(key);
+	if (it != notes.end())
+	{
+		return it->second;
+	}
+	else
+	{
+		cout << "Моя твоя не понимать. Напишите правильно :0 ( до " << notes.size() << "): " << endl;
+	}
 }
-template int getPositiveNumber(istream& in);
-template double getPositiveNumber(istream& in); // проверяет целые и числа с запятыми
 
 template <typename T>
 T GetCorrectDiameter(T min, T max)
 {
-	T diameter;
-	cin >> diameter;
-	while (((diameter != 500) && (diameter != 700) && (diameter != 1000) && (diameter != 1400)) || diameter < min || diameter > max || cin.fail() || cin.peek() != '\n')
+	T diam;
+	cin >> diam;
+	while (((diam != 500) && (diam != 700) && (diam != 1000) && (diam != 1400)) || diam < min || diam > max || cin.fail() || cin.peek() != '\n')
 	{
 		cin.clear();
 		cin.ignore(1000000, '\n');
-		cout << "Please, enter the correct pipe diameter [500, 700, 1000, 1400]: ";
-		cin >> diameter;
+		cout << "Пожалуйста, напишите верный диаметр трубы (500, 700, 1000, 1400): " << endl;
+		cin >> diam;
 	}
-	cerr << diameter << endl;
-	return diameter;
+	cerr << diam << endl;
+	return diam;
+}
+
+
+template <typename K>
+unordered_map<int, K> removeKeyIfExists(unordered_map<int, K>& notes, int key) {
+	while (true) {
+		auto it = notes.find(key);
+		if (it != notes.end()) {
+			notes.erase(it);
+			cout << "Готово. Удалили!" << endl;
+			return notes;
+		}
+		else {
+			cout << "Мы не нашли то, что вы хотели удалить. Возможно вы сами когда-то там удалили..." << endl;
+			key = GetCorrectData(1, findMaxId(notes));
+		}
+	}
+}
+string inputString(istream& in = cin);
+template<typename K, typename V>
+K findMaxId(const  unordered_map<K, V>& map) {
+	if (map.empty()) {
+		throw  runtime_error("Пусто...");
+	}
+
+	K maxId = numeric_limits<K>::min();
+
+	for (const auto& pair : map) {
+		if (pair.first > maxId) {
+			maxId = pair.first;
+		}
+	}
+	return maxId;
+}
+
+template <typename T>
+T inputNumber(istream& in = cin)
+{
+	T x;
+	while ((in >> x).fail()
+		|| in.peek() != '\n')
+	{
+		in.clear();
+		in.ignore(10000, '\n');
+		cout << "НЕ ЧИСЛО! " << endl;
+	}
+	cerr << x << endl;
+	return x;
+}
+string inputString(istream& in)
+{
+	string str;
+	 getline(in >>  ws, str);
+	cerr << str << endl;
+	return str;
 }

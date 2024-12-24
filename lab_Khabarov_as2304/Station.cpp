@@ -1,96 +1,137 @@
-//КС
-#include "Station.h"
+п»ї#include "Station.h"
 #include "Data.h"
+int CStations::maxId = 0;
 
-using namespace std;
-
-int Station::maxId = 0;
-
-Station::Station() // https://github.com/papilinatm/cpp_lessons_2020/commit/9577d7431a4351dbdfe9de951d0b92b50e16a2f4
+int CStations::GetId()
 {
-	Id = ++maxId;
-	station_name = "";
-	station_working_workshops = 0;
-}; // Для Id
-
-ostream& operator << (ostream& out, const Station& Station) // поток вывода.
-{
-	out << "ID КС: " << Station.Id << endl;
-	out << "Имя: " << Station.station_name << endl;
-	out << "Количество цехов: " << Station.station_workshops << endl;
-	out << "Количество РАБОЧИХ цехов: " << Station.station_working_workshops << endl;
-		out << "Эффективность: " << Station.station_efficiency << endl;
-		out << endl;
-
-	return out;
+    return Id;
 }
-istream& operator >> (istream& in, Station& Station) // поток ввода.
+string CStations::Getname() const
 {
-	cout << "ID КС: " << Station.Id << endl;
-	cout << "Введите имя станции: " << endl;
-	Station.station_name = inputString(in);
-	cout << "Введите число цехов: " << endl;
-	Station.station_workshops = getPositiveNumber<int>(in);
-	cout << "Количество РАБОЧИХ цехов: " << endl;
-	Station.station_working_workshops = getCorrectNumber<int>(0, Station.station_workshops, true, in);
-	cout << "Введите число эффективности: " << endl;
-	Station.station_efficiency = getPositiveNumber<double>(in);
-
-	return in;
+    return Station_name;
 }
 
-ofstream& operator << (ofstream& fout, const Station& Station) // сохранение
+int CStations::GetWorkshops() const
 {
-	fout << Station.Id << endl;
-	fout << Station.station_name << endl;
-	fout << Station.station_workshops << endl;
-	fout << Station.station_working_workshops << endl;
-	fout << Station.station_efficiency << endl;
-
-	return fout;
+    return station_workshops;
 }
 
-ifstream& operator >> (ifstream& fin, Station& Station) // загрузка
+int CStations::GetActWorkshops() const
 {
-	fin >> Station.Id;
-	getline(fin >> ws, Station.station_name);
-	fin >> Station.station_workshops;
-	fin >> Station.station_working_workshops;
-	fin >> Station.station_efficiency;
-
-	return fin;
+    return Station_working_workshops;
 }
 
-Station Station::addStation() // создаёт новую станцию
+int CStations::GetPercentOfNonActiveWorkshops() const
 {
-	Station Station;
-	cin >> Station;
-	return Station;
-}
-void Station::resetMaxId()
-{
-	maxId = 0; //Удаление КС
-}
-bool Station::run_working_workshops() // чтобы поменять количество рабочих цехов. Посмотрел у Аллы. Каюсь.
-{
-	if (station_working_workshops < station_workshops)
-	{
-		station_working_workshops++;
-		return 1;
-	}
-	else
-		return 0;
+    return (station_workshops - Station_working_workshops) * 100 / station_workshops;
 }
 
-bool Station::stop_working_workshops() // Также
-{
-	if (station_working_workshops > 0)
-	{
-		station_working_workshops--;
-		return 1;
-	}
-	else
-		return 0;
+int CStations::Get_Id_in() const {
+    return id_in;
 }
 
+int CStations::Get_Id_out() const {
+    return id_out;
 
+}
+int CStations::GetShortestPath() const {
+    return shortest_path;
+}
+
+void CStations::Set_Id_in(int in) {
+    id_in = in;
+}
+
+void CStations::Set_Id_out(int out) {
+    id_out = out;
+}
+
+void CStations::SetActWorkshops(int cnt)
+{
+    Station_working_workshops = cnt;
+}
+void CStations::SetShortestPath(int sh) {
+    shortest_path = sh;
+}
+
+void CStations::PrintWorkshops() const
+{
+    cout << Station_working_workshops << " РёР· " << station_workshops << " СЂР°Р±РѕС‚Р°СЋС‚." << endl;
+}
+void CStations::EditCStation()
+{
+    cout << "Р’С‹ С…РѕС‚РёС‚Рµ РёР·РјРµРЅРёС‚СЊ РїР°СЂР°РјРµС‚СЂС‹ С†РµС…РѕРІ?" << endl;
+    cout << "1. Р”Р°" << endl;
+    cout << "2. РќРµС‚" << endl;
+    switch (GetCorrectData(1, 2))
+    {
+    case 1:
+    {
+        cout << "РќР°РїРёС€РёС‚Рµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р РђР‘РћР§РРҐ С†РµС…РѕРІ: ";
+        int active = GetCorrectData(1, station_workshops);
+        SetActWorkshops(active);
+        PrintWorkshops();
+
+    }
+    case 2:
+        return;
+    default:
+    {
+        cout << "Р°." << endl;
+        break;
+    }
+    }
+}
+istream& operator >> (istream& in, CStations& newCStations)
+{
+    newCStations.Id = ++newCStations.maxId;
+    cout << "ID: " << newCStations.Id << endl;
+    cout << "РќР°РїРёС€РёС‚Рµ РёРјСЏ РљРЎ: " << endl;
+    INPUT_LINE(in, newCStations.Station_name);
+    cout << "РќР°РїРёС€РёС‚Рµ РєРѕР»РёС‡РµСЃС‚РІРѕ С†РµС…РѕРІ : " << endl;
+    newCStations.station_workshops = GetCorrectData(1, 100);
+    cout << "РќР°РїРёС€РёС‚Рµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р РђР‘РћР§РРҐ С†РµС…РѕРІ: " << endl;
+    newCStations.Station_working_workshops = GetCorrectData(1, newCStations.station_workshops);
+    cout << "РќР°РїРёС€РёС‚Рµ СЌС„С„РµРєС‚РёРІРЅРѕСЃС‚СЊ (РѕС‚ 0 РґРѕ 1): " << endl;
+    newCStations.Station_efficiency = GetCorrectData(0.0, 1.0);
+    return in;
+}
+
+ostream& operator << (ostream& out, const CStations& newCStations)
+{
+    if (newCStations.Station_name == "Nothing")
+    {
+        out << "Р’С‹ РЅРёС‡РµРіРѕ РЅРµ Р·Р°РїРёСЃР°Р»Рё!" << endl ;
+    }
+    else
+    {
+        out << "ID: " << newCStations.Id << ";" << endl;
+        out << "РРјСЏ РљРЎ: " << newCStations.Station_name << ";" << endl; 
+        out << "РљРѕР»РёС‡РµСЃС‚РІРѕ С†РµС…РѕРІ: " << newCStations.station_workshops << ";" << endl; 
+        out << "РљРѕР»РёС‡РµСЃС‚РІРѕ Р РђР‘РћР§РРҐ С†РµС…РѕРІ: " << newCStations.Station_working_workshops << ";" << endl;
+        out << "Р­С„С„РµРєС‚РёРІРЅРѕСЃС‚СЊ: " << newCStations.Station_efficiency << ";" << endl;
+    }
+    return out;
+}
+
+ifstream& operator >> (ifstream& flin, CStations& newCStations)
+{
+    flin >> newCStations.Id;
+    newCStations.maxId = newCStations.Id;
+    flin.ignore();
+    getline(flin, newCStations.Station_name);
+    flin >> newCStations.station_workshops;
+    flin >> newCStations.Station_working_workshops;
+    flin >> newCStations.Station_efficiency;
+    return flin;
+}
+
+ofstream& operator << (ofstream& fout, const CStations& newCStations)
+{
+    fout << newCStations.Id << endl;
+    fout << newCStations.Station_name << endl;
+    fout << newCStations.station_workshops << endl;
+    fout << newCStations.Station_working_workshops << endl;
+    fout << newCStations.Station_efficiency << endl;
+    return fout;
+}

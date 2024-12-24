@@ -1,39 +1,118 @@
-// header ��� ������ �� �������� � �����������
-#pragma once
+﻿#pragma once
 #include <iostream>
-#include <string>
-#include <fstream>
-#include <chrono> // ��� ������� (�����������)
+#include <unordered_map>
+using namespace std;
 
 
-std::string inputString(std::istream& in = std::cin); //  Data.app
+#define INPUT_LINE(in, str) getline(in>> ws, str); \
+						 cerr << str <<  endl
+#define PRINT_PARAM(out, x) out<< #x << "=" << x <<  endl
 template <typename T>
-
-T inputNumber(std::istream& in = std::cin);
-
-template <typename T>
-T getCorrectNumber(T a, T b, bool included = true, std::istream& in = std::cin);
-
-template <typename T>
-T getPositiveNumber(std::istream& in = std::cin);
-
-template <typename T>
-T GetCorrectDiameter(T min, T max);
-
-
-class redirect_output_wrapper // ����������� (https://github.com/papilinatm/cpp_lessons_2020/commit/347852a592b25762a6b02f685bb342befc015191)
+T GetCorrectData(T min, T max)
 {
-	std::ostream& stream;
-	std::streambuf* const old_buf;
+	T x;
+	while (( cin >> x).fail() ||  cin.peek() != '\n' || x < min || x > max)
+	{
+		 cin.clear();
+		 cin.ignore(100000, '\n');
+		 cout << "Мы вас не поняли. Напишите число от " << min << " до " << max << ":" << endl;
+	}
+	cerr << x << endl;
+
+	return x;
+}
+template <typename T>
+T& SelectElement(unordered_map<int, T>& notes, int key)
+{
+	auto it = notes.find(key);
+	if (it != notes.end())
+	{
+		return it->second;
+	}
+	else
+	{
+		cout << "Моя твоя не понимать. Напишите правильно :0 ( до " << notes.size() << "): " << endl;
+	}
+}
+
+template <typename T>
+T GetCorrectDiameter(T min, T max)
+{
+	T diam;
+	cin >> diam;
+	while (((diam != 500) && (diam != 700) && (diam != 1000) && (diam != 1400)) || diam < min || diam > max || cin.fail() || cin.peek() != '\n')
+	{
+		cin.clear();
+		cin.ignore(1000000, '\n');
+		cout << "Пожалуйста, напишите верный диаметр трубы (500, 700, 1000, 1400): "<< endl;
+		cin >> diam;
+	}
+	cerr << diam << endl;
+	return diam;
+}
+
+
+template <typename K>
+unordered_map<int, K> removeKeyIfExists(unordered_map<int, K>& notes, int key) {
+	while (true) {
+		auto it = notes.find(key);
+		if (it != notes.end()) {
+			notes.erase(it);
+			cout << "Готово. Удалили!" << endl;
+			return notes;
+		}
+		else {
+			cout << "Мы не нашли то, что вы хотели удалить. Возможно вы сами когда-то там удалили..." << endl;
+			key = GetCorrectData(1, findMaxId(notes));
+		}
+	}
+}
+string inputString(istream& in = cin);
+template<typename K, typename V>
+K findMaxId(const  unordered_map<K, V>& map) {
+	if (map.empty()) {
+		throw  runtime_error("Пусто...");
+	}
+
+	K maxId =  numeric_limits<K>::min();
+
+	for (const auto& pair : map) {
+		if (pair.first > maxId) {
+			maxId = pair.first;
+		}
+	}
+	return maxId;
+}
+
+template <typename T>
+T inputNumber(istream& in = cin)
+{
+	T x;
+	while ((in >> x).fail()	
+		|| in.peek() != '\n')	
+	{
+		in.clear();
+		in.ignore(10000, '\n');
+		cout << "НЕ ЧИСЛО! " << endl;
+	}
+	cerr << x << endl;
+	return x;
+}
+
+class redirect_output_wrapper
+{
+	 ios& stream;
+	 streambuf* const old_buf;
 public:
-	redirect_output_wrapper(std::ostream& src)
+	redirect_output_wrapper( ios& src)
 		:old_buf(src.rdbuf()), stream(src)
 	{
 	}
+
 	~redirect_output_wrapper() {
 		stream.rdbuf(old_buf);
 	}
-	void redirect(std::ostream& dest)
+	void redirect( ostream& dest)
 	{
 		stream.rdbuf(dest.rdbuf());
 	}
