@@ -38,17 +38,17 @@ T& SelectElement(unordered_map<int, T>& notes, int key)
 template <typename T>
 T GetCorrectDiameter(T min, T max)
 {
-	T diam;
-	cin >> diam;
-	while (((diam != 500) && (diam != 700) && (diam != 1000) && (diam != 1400)) || diam < min || diam > max || cin.fail() || cin.peek() != '\n')
+	T diameter;
+	cin >> diameter;
+	while (((diameter != 500) && (diameter != 700) && (diameter != 1000) && (diameter != 1400)) || diameter < min || diameter > max || cin.fail() || cin.peek() != '\n')
 	{
 		cin.clear();
 		cin.ignore(1000000, '\n');
 		cout << "Пожалуйста, напишите верный диаметр трубы (500, 700, 1000, 1400): "<< endl;
-		cin >> diam;
+		cin >> diameter;
 	}
-	cerr << diam << endl;
-	return diam;
+	cerr << diameter << endl;
+	return diameter;
 }
 
 
@@ -62,7 +62,7 @@ unordered_map<int, K> removeKeyIfExists(unordered_map<int, K>& notes, int key) {
 			return notes;
 		}
 		else {
-			cout << "Мы не нашли то, что вы хотели удалить. Возможно вы сами когда-то там удалили..." << endl;
+			cout << "Мы не нашли то, что вы хотели удалить. Возможно вы сами когда-то там удалили...Что хотите удалить?" << endl;
 			key = GetCorrectData(1, findMaxId(notes));
 		}
 	}
@@ -98,6 +98,7 @@ T inputNumber(istream& in = cin)
 	cerr << x << endl;
 	return x;
 }
+
 
 class redirect_output_wrapper
 {

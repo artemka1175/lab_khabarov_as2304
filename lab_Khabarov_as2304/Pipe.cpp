@@ -110,8 +110,8 @@ istream& operator >> (istream& in, Pipe& newPipe)
     INPUT_LINE(in, newPipe.pipe_name);
     cout << "Напиши длину трубы (в метрах, до 10 км): " << endl;
     newPipe.Pipe_length = GetCorrectData(0.0, 10000.0);
-    cout << "Напиши диаметр трубы (в миллиметрах, до 1400): " << endl;
-    newPipe.Pipe_diameter = GetCorrectData(0.0, 1400.0);
+    cout << "Напишите диаметр трубы (500, 700, 1000, 1400): ";
+    newPipe.Pipe_diameter = GetCorrectDiameter(500, 1400);
     cout << " Напиши статус трубы (Если трубы в ремонте - пишите 1. Если труба готова/не в ремонте - пишите 0): " << endl;
     newPipe.isUnderRepair = GetCorrectData(0, 1);
     return in;

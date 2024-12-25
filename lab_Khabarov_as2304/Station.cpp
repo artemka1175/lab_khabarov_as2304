@@ -16,7 +16,7 @@ int CStations::GetWorkshops() const
     return station_workshops;
 }
 
-int CStations::GetActWorkshops() const
+int CStations::GetWorkingWorkshops() const
 {
     return Station_working_workshops;
 }

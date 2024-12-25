@@ -20,7 +20,7 @@ public:
 	int GetId();
 	string Getname() const;
 	int GetWorkshops() const;
-	int GetActWorkshops() const;
+	int GetWorkingWorkshops() const;
 	int GetPercentOfNonActiveWorkshops() const;
 	int Get_Id_in() const;
 	int Get_Id_out() const;
