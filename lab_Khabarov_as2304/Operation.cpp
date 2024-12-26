@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include <limits>
+#include <algorithm>
 #include <unordered_map>
 #include <unordered_set>
 #include <set>
@@ -55,7 +57,7 @@ void SPIDER::ConnectInSPIDER1(unordered_map<int, Pipe>& Pipes, unordered_map<int
 	}
 	if (n < 1)
 	{
-		cout << "Труба занята...";
+		cout << "Трубы заняты...";
 		return;
 	}
 
@@ -156,7 +158,7 @@ void SPIDER::ShowSPIDER(unordered_map<int, vector<connections>>& Connections)
 		{
 			for (const auto& conn : elem.second)
 			{
-				cout << "\t[" << conn.id_entry << "] \t[" << conn.id_pipe << "] \t[" << conn.id_out << "]" << endl;
+				cout << "\t" << conn.id_entry << " \t" << conn.id_pipe << " \t" << conn.id_out << endl;
 			}
 		}
 	}
@@ -169,10 +171,10 @@ void SPIDER::DeleteConnection(unordered_map<int, vector<connections>>& Connectio
 	int idp = GetCorrectData(1, int(Pipes.size()));
 	for (auto& elem : Connections)
 	{
-		auto& conn_list = elem.second;
-		conn_list.erase(remove_if(conn_list.begin(), conn_list.end(),
+		auto& connection_list = elem.second;
+		connection_list.erase(remove_if(connection_list.begin(), connection_list.end(),
 			[idp](const connections& conn) { return conn.id_pipe == idp; }),
-			conn_list.end());
+			connection_list.end());
 	}
 }
 
@@ -243,60 +245,6 @@ vector<int> SPIDER::topologSort(unordered_map<int, Pipe>& Pipes, unordered_map<i
 	return result;
 }
 
-void SPIDER::InitializeCapacities(unordered_map<int, Pipe>& pipes) {
-	for (auto& pipePair : pipes) {
-		Pipe& pipe = pipePair.second;
-		int diameter = pipe.GetDiameter();
-
-		if (diameter == 500) {
-			pipe.SetCapac(5);
-		}
-		else if (diameter == 700) {
-			pipe.SetCapac(12);
-		}
-		else if (diameter == 1000) {
-			pipe.SetCapac(28);
-		}
-		else if (diameter == 1400) {
-			pipe.SetCapac(95);
-		}
-	}
-}
-
-
-using namespace std;
-
-
-
-bool BFS(vector<vector<int>>& rGraph, int s, int t, vector<int>& parent)
-{
-	int V = rGraph.size();
-	vector<bool> visited(V, false);
-
-	queue<int> q;
-	q.push(s);
-	visited[s] = true;
-	parent[s] = -1;
-
-	while (!q.empty())
-	{
-		int u = q.front();
-		q.pop();
-
-		for (int v = 0; v < V; v++)
-		{
-			if (!visited[v] && rGraph[u][v] > 0)
-			{
-				q.push(v);
-				parent[v] = u;
-				visited[v] = true;
-			}
-		}
-	}
-
-	return visited[t];
-}
-
 
 void Operations::EditPipes(unordered_map<int, Pipe>& pipes, const unordered_set<int>& selectedPipes, unordered_map<int, CStations>& Stations, unordered_map<int, vector<connections>>& Connections) {
 	cout << "Что вы хотите сделать?" << endl;
@@ -358,7 +306,247 @@ void Operations::EditPipes(unordered_map<int, Pipe>& pipes, const unordered_set<
 	}
 }
 
+void SPIDER::InitializeCapacities(unordered_map<int, Pipe>& pipes) {
+	for (auto& pipePair : pipes) {
+		Pipe& pipe = pipePair.second;
+		int diameter = pipe.GetDiameter();
 
+
+		if (diameter == 700) {
+			pipe.SetCapac(12);
+		}
+		else if (diameter == 1000) {
+			pipe.SetCapac(28);
+		}
+		else if (diameter == 1400) {
+			pipe.SetCapac(95);
+		}
+		else if (diameter == 500) {
+			pipe.SetCapac(5);
+		}
+	}
+}
+
+void SPIDER::Way(unordered_map<int, Pipe>& Pipes, unordered_map<int, vector<connections>>& Connections, unordered_map<int, CStations>& Stations)
+{
+	if (Connections.size() == 0)
+	{
+		cout << "Нету связей... :( " << endl;
+		return;
+	}
+
+	set<int> vertices;
+	int maxLenght = 0;
+	int minLenght = numeric_limits<int>::max();
+
+	for (auto& connection_list : Connections)
+	{
+		for (auto& conn : connection_list.second)
+		{
+			vertices.insert(conn.id_entry);
+			vertices.insert(conn.id_out);
+			if (conn.id_entry > maxLenght)
+			{
+				maxLenght = conn.id_entry;
+			}
+			if (conn.id_entry < minLenght)
+			{
+				minLenght = conn.id_entry;
+			}
+			if (conn.id_out > maxLenght)
+			{
+				maxLenght = conn.id_out;
+			}
+			if (conn.id_out < minLenght)
+			{
+				minLenght = conn.id_out;
+			}
+		}
+	}
+
+	int start_vertices;
+	int end_vertices;
+
+	cout << "Напишите ID КС начало: ";
+	start_vertices = GetCorrectData(minLenght, maxLenght);
+	while (vertices.find(start_vertices) == vertices.end())
+	{
+		cout << "Ещё раз. Напишите. ID. КС. НАЧАЛО.: ";
+		start_vertices = GetCorrectData(minLenght, maxLenght);
+	}
+
+	cout << "Напишите ID КС конец: ";
+	end_vertices = GetCorrectData(minLenght, maxLenght);
+	while (vertices.find(end_vertices) == vertices.end())
+	{
+		cout << "конец...: ";
+		end_vertices = GetCorrectData(minLenght, maxLenght);
+	}
+
+	for (const auto& vertex : vertices) {
+		Stations[vertex].SetShortestPath(numeric_limits<int>::max());
+	}
+	Stations[start_vertices].SetShortestPath(0);
+
+	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> queueueue;
+	queueueue.push({ 0, start_vertices });
+
+	unordered_map<int, int> predecessors;
+
+	while (!queueueue.empty()) {
+		int current_vertices = queueueue.top().second;
+		int current_distance = queueueue.top().first;
+		queueueue.pop();
+
+		if (current_vertices == end_vertices) {
+			break;
+		}
+
+		for (const auto& conn : Connections[current_vertices]) {
+			int neighbor_vertices = conn.id_out;
+			Pipe& pipe = Pipes[conn.id_pipe];
+
+			if (pipe.GetRepairStatus() == 1) continue;
+
+			int new_distance = current_distance + pipe.GetLen();
+
+			if (new_distance < Stations[neighbor_vertices].GetShortestPath()) {
+				Stations[neighbor_vertices].SetShortestPath(new_distance);
+				queueueue.push({ new_distance, neighbor_vertices });
+				predecessors[neighbor_vertices] = current_vertices;
+			}
+		}
+	}
+
+	if (Stations[end_vertices].GetShortestPath() == numeric_limits<int>::max())
+	{
+		cout << "трубы или труба не работает... " << endl;
+	}
+	else
+	{
+		cout << "Ответ: " << Stations[end_vertices].GetShortestPath() << endl;
+		vector<int> path;
+		for (int Path = end_vertices; Path != start_vertices; Path = predecessors[Path]) {
+			path.push_back(Path);
+		}
+		path.push_back(start_vertices);
+		reverse(path.begin(), path.end());
+
+		cout << "Посещаемые КС: ";
+		for (size_t i = 0; i < path.size(); ++i) {
+			cout << path[i];
+			if (i < path.size() - 1) {
+				cout << " -> ";
+			}
+		}
+		cout << endl;
+	}
+}
+
+
+bool BFS(vector<vector<int>>& rGraph, int s, int t, vector<int>& parent)
+{
+	int V = rGraph.size();
+	vector<bool> visited(V, false);
+
+	queue<int> que;
+	que.push(s);
+	visited[s] = true;
+	parent[s] = -1;
+
+	while (!que.empty())
+	{
+		int u = que.front();
+		que.pop();
+
+		for (int v = 0; v < V; v++)
+		{
+			if (!visited[v] && rGraph[u][v] > 0)
+			{
+				que.push(v);
+				parent[v] = u;
+				visited[v] = true;
+			}
+		}
+	}
+
+	return visited[t];
+}
+
+void SPIDER::flow(unordered_map<int, vector<connections>>& Connections, unordered_map<int, Pipe>& Pipes, unordered_map<int, CStations>& Stations) {
+	InitializeCapacities(Pipes);
+
+	if (Connections.size() == 0) {
+		cout << "Нет связей!" << endl;
+		return;
+	}
+
+	set<int> vertices;
+	int maxLenght = 0;
+	int minLenght = numeric_limits<int>::max();
+
+	for (auto& connection_list : Connections) {
+		for (auto& conn : connection_list.second) {
+			vertices.insert(conn.id_entry);
+			vertices.insert(conn.id_out);
+			if (conn.id_entry > maxLenght) {
+				maxLenght = conn.id_entry;
+			}
+			if (conn.id_entry < minLenght) {
+				minLenght = conn.id_entry;
+			}
+			if (conn.id_out > maxLenght) {
+				maxLenght = conn.id_out;
+			}
+			if (conn.id_out < minLenght) {
+				minLenght = conn.id_out;
+			}
+		}
+	}
+
+	int s;
+	cout << "Напишите начало (КС): ";
+	s = GetCorrectData(minLenght, maxLenght);
+	cout << "Напишите конец (КС): ";
+	int t;
+	t = GetCorrectData(minLenght, maxLenght);
+
+	while (s == t) {
+		cout << "Другое значение." << endl;
+		t = GetCorrectData(minLenght, maxLenght);
+	}
+
+	int V = maxLenght + 1;
+	vector<vector<int>> RGraph(V, vector<int>(V, 0));
+
+	for (const auto& connection_list : Connections) {
+		for (const auto& conn : connection_list.second) {
+			int capacity = Pipes[conn.id_pipe].GetCapac();
+			RGraph[conn.id_entry][conn.id_out] = capacity;
+		}
+	}
+
+	vector<int> parent(V, -1);
+	int maxFlow = 0;
+
+	while (BFS(RGraph, s, t, parent)) {
+		int pathFlow = numeric_limits<int>::max();
+		for (int v = t; v != s; v = parent[v]) {
+			int u = parent[v];
+			pathFlow = min(pathFlow, RGraph[u][v]);
+		}
+
+		for (int v = t; v != s; v = parent[v]) {
+			int u = parent[v];
+			RGraph[u][v] -= pathFlow;
+			RGraph[v][u] += pathFlow;
+		}
+
+		maxFlow += pathFlow;
+	}
+
+	cout << "Ответ: " << maxFlow << endl;
+}
 
 void Operations::EditCStations(unordered_map<int, CStations>& stations, unordered_set<int>& selected_stations, unordered_map<int, Pipe>& Pipes, unordered_map<int, vector<connections>>& Connections) {
 	cout << "Что вы хотите сделать?" << endl;

@@ -33,6 +33,9 @@ int Pipe::GetCSid2() const {
 }
 
 int Pipe::GetCapac() {
+    if (GetRepairStatus()) {
+        return 0;
+    }
     return capac;
 }
 
@@ -109,7 +112,7 @@ istream& operator >> (istream& in, Pipe& newPipe)
     cout << "Напишите имя: " << endl;
     INPUT_LINE(in, newPipe.pipe_name);
     cout << "Напиши длину трубы (в метрах, до 10 км): " << endl;
-    newPipe.Pipe_length = GetCorrectData(0.0, 10000.0);
+    newPipe.Pipe_length = GetCorrectData(1.0, 10000.0);
     cout << "Напишите диаметр трубы (500, 700, 1000, 1400): ";
     newPipe.Pipe_diameter = GetCorrectDiameter(500, 1400);
     cout << " Напиши статус трубы (Если трубы в ремонте - пишите 1. Если труба готова/не в ремонте - пишите 0): " << endl;
